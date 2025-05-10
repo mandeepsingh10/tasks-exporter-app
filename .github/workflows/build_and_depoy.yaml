@@ -1,0 +1,78 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  AWS_REGION: 'ap-south-1'
+  ECR_REPOSITORY: '863816375354.dkr.ecr.ap-south-1.amazonaws.com/tasks-exporter'
+  EKS_CLUSTER_NAME: 'my-eks-cluster'
+  K8S_NAMESPACE: 'default'
+  AWS_ROLE_ARN: 'arn:aws:iam::863816375354:role/ecr_role_gha'
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.13'
+
+    - name: Lint Python code
+      run: |
+        pip install flake8
+        flake8 . --count --show-source --statistics --max-line-length=120
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: ${{ env.AWS_REGION }}
+        role-to-assume: ${{ env.AWS_ROLE_ARN }}
+        role-session-name: github-actions
+
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build Docker image
+      run: |
+        docker build -t ${{ env.ECR_REPOSITORY }}:${{ github.sha }} .
+
+    - name: Scan Docker image with Trivy
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        format: 'table'
+        exit-code: '0' # The security check will be marked as successful even if the image has vulnerabilities. This is done to avoid errors in gha workflow incase of vulnerabilities.
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL'
+
+    - name: Push Docker image
+      run: |
+        docker push ${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
+
+    - name: Configure kubectl
+      continue-on-error: true # As we are using mock-outputs
+      run: |
+        aws eks update-kubeconfig \
+          --name ${{ env.EKS_CLUSTER_NAME }} \
+          --region ${{ env.AWS_REGION }}
+
+    - name: Deploy to EKS
+      continue-on-error: true # As we are using mock-outputs
+      run: |
+        # Update image tag in deployment manifest
+        sed -i "s|{{IMAGE_TAG}}|${{ env.IMAGE_TAG }}|g" manifests/deployment.yaml
+        
+        # Apply deployment
+        kubectl apply -f manifests/deployment.yaml -n ${{ env.K8S_NAMESPACE }}

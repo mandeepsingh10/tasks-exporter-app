@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'task-exporter'
+    static_configs:
+      - targets: ['tasks-app:5000']  # Uses container name from Part 1

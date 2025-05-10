@@ -1,0 +1,14 @@
+# Default configuration for the application
+# These values can be overridden by environment variables.
+
+# Flask application settings
+app:
+  host: "0.0.0.0" # Default host
+  port: 5000      # Default port
+  debug: true     # Default debug mode
+
+# You can add other configuration sections here as needed,
+# for example, logging settings, database connections, etc.
+# logging:
+#   level: "INFO"
+#   file: "/var/log/app.log"

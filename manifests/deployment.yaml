@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: task-exporter
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: task-exporter
+  template:
+    metadata:
+      labels:
+        app: task-exporter
+    spec:
+      containers:
+      - name: task-exporter
+        image: 123456789012.dkr.ecr.us-west-2.amazonaws.com/my-repo:{{IMAGE_TAG}}
+        ports:
+        - containerPort: 5000

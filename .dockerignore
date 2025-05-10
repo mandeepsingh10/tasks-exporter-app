@@ -1,0 +1,56 @@
+# .dockerignore
+
+# Python virtual environment
+venv/
+*.venv/
+.venv/
+
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE and editor specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git specific files
+.git/
+.gitignore
+
+# Docker specific files (if any, though Dockerfile itself is needed by build context)
+# Dockerfile # Usually you don't ignore the Dockerfile itself
+# .dockerignore # You don't ignore the .dockerignore file
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Test files and directories (if you don't want them in the production image)
+# tests/
+# *.test.py
+# pytest.ini
+# .pytest_cache/
+
+# Coverage data
+.coverage
+coverage.xml
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Local configuration files that should not be in the image
+# config.local.yaml
+# secrets.env
+
+# Logs
+*.log
+logs/
+
+# Other temporary files or downloaded assets not needed in the image
+# tmp/
+# downloads/
