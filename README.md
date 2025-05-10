@@ -60,3 +60,7 @@ curl http://localhost:9090/targets
 |---------------|----------------|-----------|
 | Exporter App  | 5000           | 5003      |
 | Prometheus    | 9090           | 9090      |
+
+## NOTE
+1. Please refer to the Actions Tab in the repository for the workflow which will deploy the application on k8s. Here we are using a CIOps approach but in a production environment I would prefer to use GitOps with ArgoCD. 
+2. The github actions workflow builds and pushes a docker image to an ECR registry in my personal AWS account, deployment to k8s steps only includes mock inputs.

@@ -62,14 +62,14 @@ jobs:
         echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
 
     - name: Configure kubectl
-      continue-on-error: true # As we are using mock-outputs
+      continue-on-error: true # As we are using mock-inputs
       run: |
         aws eks update-kubeconfig \
           --name ${{ env.EKS_CLUSTER_NAME }} \
           --region ${{ env.AWS_REGION }}
 
     - name: Deploy to EKS
-      continue-on-error: true # As we are using mock-outputs
+      continue-on-error: true # As we are using mock-inputs
       run: |
         # Update image tag in deployment manifest
         sed -i "s|{{IMAGE_TAG}}|${{ env.IMAGE_TAG }}|g" manifests/deployment.yaml
