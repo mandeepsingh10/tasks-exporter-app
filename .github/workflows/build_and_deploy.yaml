@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths-ignore:
       - '**/README.md'
+      - '.github/workflows/*'
 env:
   AWS_REGION: 'ap-south-1'
   ECR_REPOSITORY: '863816375354.dkr.ecr.ap-south-1.amazonaws.com/tasks-exporter'
